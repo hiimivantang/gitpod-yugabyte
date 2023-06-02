@@ -15,3 +15,10 @@ tasks:
     command: |
       gp await-port 5433
       ysqlsh
+  - name: postgres
+    before: brew install libpq && brew link --force libpq
+    command: |
+      docker run --name postgresql -e POSTGRES_USER=postgres -e POSTGRES_HOST_AUTH_METHOD=trust -p 5432:5432 -v ~/postgresql_data/:/var/lib/postgresql/data -d postgres
+      gp ports await 5432
+      sleep 10
+      psql postgresql://postgres:postgres@localhost
