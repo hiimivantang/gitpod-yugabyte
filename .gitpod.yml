@@ -1,4 +1,5 @@
-image: gitpod/workspace-yugabytedb
+image: 
+  file: .gitpod.Dockerfile
 
 tasks:
   - name: 1a-yb

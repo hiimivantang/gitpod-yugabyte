@@ -1,4 +1,4 @@
-FROM gitpod/workspace-base
+FROM gitpod/workspace-full
 
 ARG YB_VERSION=2.18.0.1
 ARG YB_BUILD=4
@@ -23,21 +23,18 @@ RUN curl -sSLo ./yugabyte.tar.gz https://downloads.yugabyte.com/releases/${YB_VE
 RUN brew install libpq
 RUN brew link --force libpq
 
-# python is a required dependency of ycqlsh
-# but it doesn't support Python 3.10+ due to https://github.com/yugabyte/cqlsh/issues/11, install 3.9 for now
-# when building yugabyte combos, if our base is full, related python chunk tests fail
-# so, use base as the combo ref, add chunks, but ignore Python chunk and install manually
-ENV PATH="$HOME/.pyenv/bin:$HOME/.pyenv/shims:$PATH"
-ENV PYENV_ROOT="$HOME/.pyenv"
-RUN git clone https://github.com/pyenv/pyenv.git ~/.pyenv \
-	&& git -C ~/.pyenv checkout ff93c58babd813066bf2d64d004a5cee33c0f27b \
-	&& pyenv install ${PYTHON_VERSION} \
-	&& pyenv global ${PYTHON_VERSION}
+RUN brew install python@3.9
+RUN echo "export PATH=/home/linuxbrew/.linuxbrew/opt/python@3.9/libexec/bin/:$PATH" >> /home/gitpod/.bashrc 
 
 # configure the interpreter
 RUN ["/usr/local/yugabyte/bin/post_install.sh"]
 
 
+# re-initialization is automatically handled
+RUN echo "\n# yugabytedb start command" >> /home/gitpod/.bashrc.d/100-yugabyedb-launch
+RUN echo "[[ -f \${GITPOD_REPO_ROOT}/.nopreload ]] || yugabyted start --base_dir=$STORE --listen=$HOST > /dev/null" >> /home/gitpod/.bashrc.d/100-yugabyedb-launch
+
+RUN chmod +x /home/gitpod/.bashrc.d/100-yugabyedb-launch
 
 # set the execution path and other env variables
 ENV PATH="$YB_BIN_PATH/bin/:$PATH"
