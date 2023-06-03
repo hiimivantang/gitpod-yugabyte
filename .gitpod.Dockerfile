@@ -4,7 +4,6 @@ ARG YB_VERSION=2.18.0.1
 ARG YB_BUILD=4
 ARG YB_BIN_PATH=/usr/local/yugabyte
 ARG ROLE=gitpod
-ARG PYTHON_VERSION=3.9
 
 USER $ROLE
 # create bin and data path
@@ -30,15 +29,12 @@ RUN echo "export PATH=/home/linuxbrew/.linuxbrew/opt/python@3.9/libexec/bin/:$PA
 RUN ["/usr/local/yugabyte/bin/post_install.sh"]
 
 
-# re-initialization is automatically handled
-RUN echo "\n# yugabytedb start command" >> /home/gitpod/.bashrc.d/100-yugabyedb-launch
-RUN echo "[[ -f \${GITPOD_REPO_ROOT}/.nopreload ]] || yugabyted start --base_dir=$STORE --listen=$HOST > /dev/null" >> /home/gitpod/.bashrc.d/100-yugabyedb-launch
-
-RUN chmod +x /home/gitpod/.bashrc.d/100-yugabyedb-launch
-
 # set the execution path and other env variables
-ENV PATH="$YB_BIN_PATH/bin/:$PATH"
+
+RUN echo "export PATH=/usr/local/yugabyte/bin/:$PATH"
+
 ENV HOST=127.0.0.1
+
 ENV STORE=/var/ybdp
 ENV YSQL_PORT=5433
 ENV YCQL_PORT=9042
