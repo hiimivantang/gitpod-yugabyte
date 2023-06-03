@@ -31,7 +31,7 @@ RUN ["/usr/local/yugabyte/bin/post_install.sh"]
 
 # set the execution path and other env variables
 
-RUN echo "export PATH=/usr/local/yugabyte/bin/:$PATH"
+RUN echo "export PATH=/usr/local/yugabyte/bin/:$PATH" >> /home/gitpod/.bashrc
 
 ENV HOST=127.0.0.1
 
